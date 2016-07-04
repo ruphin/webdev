@@ -11,11 +11,6 @@ if [ -f /app/bower.json ]; then
 	bower install
 fi
 
-# Build
-if [ -f /app/gulpfile.js ]; then
-	gulp
-fi
-
 case "$1" in
 shell)
 	echo "Dropping to shell"
