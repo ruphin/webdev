@@ -16,14 +16,14 @@ if [ -f /app/gulpfile.js ]; then
 	gulp
 fi
 
-
 case "$1" in
 shell)
 	echo "Dropping to shell"
 	exec bash
 	;;
 build)
-	echo "Build finished"
+	echo "Building"
+	gulp
 	;;
 serve)
 	echo "Serving website"
