@@ -16,16 +16,9 @@ shell)
 	echo "Dropping to shell"
 	exec bash
 	;;
-build)
-	echo "Building"
-	gulp
-	;;
-serve)
-	echo "Serving website"
-	gulp serve
-	;;
+)
 *)
-	echo "No command given. Dropping to shell"
-	exec bash
+	echo "gulp $1"
+	gulp $1
 	;;
 esac
