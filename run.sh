@@ -16,7 +16,6 @@ shell)
 	echo "Dropping to shell"
 	exec bash
 	;;
-)
 *)
 	echo "gulp $1"
 	gulp $1
