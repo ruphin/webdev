@@ -18,10 +18,12 @@ RUN set -x \
     && gosu nobody true \
     && apt-get purge -y --auto-remove ca-certificates wget
 
+### Install Yarn
+RUN npm install -g yarn
+
 ### Install Gulp and Bower
-RUN npm install -g gulp bower
+RUN yarn global add gulp bower
 
 COPY bootstrap.sh /bootstrap.sh
 COPY run.sh /home/app/run.sh
 ENTRYPOINT ["/bootstrap.sh"]
-

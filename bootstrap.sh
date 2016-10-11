@@ -11,6 +11,7 @@ fi
 usermod -u $ID app
 groupmod -g $GID app
 chown -R app:app /home/app
+chown -R app:app /root
 sync
 
 gosu app /home/app/run.sh $1
