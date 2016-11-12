@@ -8,7 +8,7 @@ fi
 
 # Install Bower packages
 if [ -f /app/bower.json ]; then
-	bower install
+	bower --allow-root install
 fi
 
 case "$1" in

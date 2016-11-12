@@ -8,10 +8,18 @@ if [ -z "$ID" ] || [ -z "$GID" ]; then
 	exit 1
 fi
 
-usermod -u $ID app
-groupmod -g $GID app
-chown -R app:app /home/app
-chown -R app:app /root
-sync
+if [ "$ID" == "0" ]; then
+	echo "WARNING: Running as root"
+	chown -R root:root /home/app
+	sync
 
-gosu app /home/app/run.sh $1
+	gosu root /home/app/run.sh $1
+else
+	usermod -u $ID app
+	groupmod -g $GID app
+	chown -R app:app /home/app
+	chown -R app:app /root
+	sync
+
+	gosu app /home/app/run.sh $1
+fi
