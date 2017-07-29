@@ -1,20 +1,14 @@
 FROM node:8
 
-### Create user and settings ###
-RUN addgroup app \
+
+### Create user and group ###
+RUN deluser node \
+  && addgroup app \
 	&& useradd app --create-home -g app
 
 ### Install GOSU
 ENV GOSU_VERSION 1.10
 RUN set -ex; \
-	\
-	fetchDeps=' \
-		ca-certificates \
-		wget \
-	'; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends $fetchDeps; \
-	rm -rf /var/lib/apt/lists/*; \
 	\
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
 	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
@@ -28,9 +22,7 @@ RUN set -ex; \
 	\
 	chmod +x /usr/local/bin/gosu; \
 # verify that the binary works
-	gosu nobody true; \
-	\
-	apt-get purge -y --auto-remove $fetchDeps
+	gosu nobody true;
 
 ### Install Gulp and Bower
 RUN yarn global add gulp bower

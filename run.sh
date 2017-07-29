@@ -11,13 +11,4 @@ if [ -f /app/bower.json ]; then
 	bower --allow-root install
 fi
 
-case "$1" in
-shell)
-	echo "Dropping to shell"
-	exec bash
-	;;
-*)
-	echo "gulp $1"
-	gulp $1
-	;;
-esac
+exec $1
