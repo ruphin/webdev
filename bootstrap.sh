@@ -13,7 +13,7 @@ if [ "$ID" == "0" ]; then
 	chown -R root:root /home/app
 	sync
 
-	gosu root /home/app/run.sh $1
+	gosu root /home/app/run.sh $@
 else
 	usermod -u $ID app
 	groupmod -g $GID app
@@ -21,5 +21,5 @@ else
 	chown -R app:app /root
 	sync
 
-	gosu app /home/app/run.sh $1
+	gosu app /home/app/run.sh $@
 fi

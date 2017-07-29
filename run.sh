@@ -11,4 +11,5 @@ if [ -f /app/bower.json ]; then
 	bower --allow-root install
 fi
 
-exec $1
+echo "Running: $@"
+exec $@
