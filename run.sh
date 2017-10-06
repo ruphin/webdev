@@ -2,7 +2,7 @@
 cd /app
 
 # Install Nodejs packages
-if [ -f /app/package.json ]; then
+if [ -f "/app/package.json" ]; then
 	yarn
 fi
 
