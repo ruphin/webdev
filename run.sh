@@ -3,7 +3,7 @@ cd /app
 
 # Install Nodejs packages
 if [ -f "/app/package.json" ]; then
-	yarn
+	npm install
 fi
 
 # Install Bower packages
