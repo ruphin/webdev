@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:9
 
 ### Create user and group ###
 RUN deluser node \
@@ -24,7 +24,7 @@ RUN set -ex; \
 	gosu nobody true;
 
 ### Update to latest Yarn
-ENV YARN_VERSION 1.1.0
+ENV YARN_VERSION 1.4.1
 
 RUN set -ex \
 	&& curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
