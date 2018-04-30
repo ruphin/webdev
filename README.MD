@@ -1,10 +1,22 @@
 #### Web development environment
 
-##### Serve in development mode
-`docker run -it -v $PWD:/app ruphin/webdev serve`
+Now you can do anything!
 
-##### Build
-`docker run -it -v $PWD:/app ruphin/webdev build`
+##### Run NPM install
+
+`docker run -it -v $PWD:/app ruphin/webdev npm install`
+
+##### Start a thing
+
+`docker run -it -v $PWD:/app ruphin/webdev npm start`
 
 ##### Open a shell
-`docker run -it -v $PWD:/app ruphin/webdev shell`
+
+`docker run -it -v $PWD:/app ruphin/webdev bash`
+
+### Preinstalled utilities
+
+* npm
+* yarn
+* gulp
+* bower

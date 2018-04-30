@@ -1,4 +1,4 @@
-FROM node:9
+FROM node:10
 
 ### Create user and group ###
 RUN deluser node \
@@ -24,7 +24,7 @@ RUN set -ex; \
 	gosu nobody true;
 
 ### Update to latest Yarn
-ENV YARN_VERSION 1.4.1
+ENV YARN_VERSION 1.6.0
 
 RUN set -ex \
 	&& curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
@@ -38,8 +38,16 @@ RUN set -ex \
 	&& ln -s /opt/yarn/bin/yarn /usr/local/bin/yarnpkg \
 	&& rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
 
+RUN apt update \
+	&& apt install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 \
+	libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 \
+	libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 \
+	libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
+	ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget \
+	&& rm -rf /var/lib/apt/lists/*
+
 ### Install Gulp and Bower
-RUN yarn global add gulp bower
+RUN npm install -g add gulp bower
 
 COPY bootstrap.sh /bootstrap.sh
 COPY run.sh /home/app/run.sh
