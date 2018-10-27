@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:10.12
 
 ### Create user and group ###
 RUN deluser node \
