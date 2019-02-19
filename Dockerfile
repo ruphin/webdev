@@ -1,4 +1,4 @@
-FROM node:10.12
+FROM node:11.9.0
 
 ### Create user and group ###
 RUN deluser node \
@@ -17,39 +17,6 @@ RUN apt-get update && apt-get install -y \
 	&& apt-get purge --auto-remove -y \
 	&& rm -rf /var/lib/apt/lists/*
 
-### Install GOSU
-ENV GOSU_VERSION 1.10
-RUN set -ex; \
-	\
-	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
-	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
-	\
-	# verify the signature
-	export GNUPGHOME="$(mktemp -d)"; \
-	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
-	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
-	rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc; \
-	\
-	chmod +x /usr/local/bin/gosu; \
-	# verify that the binary works
-	gosu nobody true;
-
-### Update to latest Yarn
-ENV YARN_VERSION 1.7.0
-
-RUN set -ex \
-	&& curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
-	&& curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc" \
-	&& gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
-	&& mkdir -p /opt/yarn \
-	&& tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/yarn --strip-components=1 \
-	&& rm /usr/local/bin/yarn \
-	&& rm /usr/local/bin/yarnpkg \
-	&& ln -s /opt/yarn/bin/yarn /usr/local/bin/yarn \
-	&& ln -s /opt/yarn/bin/yarn /usr/local/bin/yarnpkg \
-	&& rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
-
 ### Install a bunch of standard libs and utilities that are required for building common nodejs modules
 RUN apt update \
 	&& apt install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 \
@@ -58,9 +25,40 @@ RUN apt update \
 	libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
 	ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget \
 	&& rm -rf /var/lib/apt/lists/*
-
-### Install Gulp and Bower
-RUN npm install -g add gulp bower
+	
+### Install GOSU
+ENV GOSU_VERSION 1.11
+RUN set -eux; \
+# save list of currently installed packages for later so we can clean up
+	savedAptMark="$(apt-mark showmanual)"; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends ca-certificates wget; \
+	if ! command -v gpg; then \
+		apt-get install -y --no-install-recommends gnupg2 dirmngr; \
+	fi; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
+	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
+	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
+	\
+# verify the signature
+	export GNUPGHOME="$(mktemp -d)"; \
+# for flaky keyservers, consider https://github.com/tianon/pgp-happy-eyeballs, ala https://github.com/docker-library/php/pull/666
+	gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
+	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
+	command -v gpgconf && gpgconf --kill all || :; \
+	rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
+	\
+# clean up fetch dependencies
+	apt-mark auto '.*' > /dev/null; \
+	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	\
+	chmod +x /usr/local/bin/gosu; \
+# verify that the binary works
+	gosu --version; \
+	gosu nobody true
 
 COPY bootstrap.sh /bootstrap.sh
 COPY run.sh /home/app/run.sh
